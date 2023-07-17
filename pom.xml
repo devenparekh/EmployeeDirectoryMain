@@ -78,7 +78,6 @@
 			<version>0.9.1</version>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -94,6 +93,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>employeedirectorymain</finalName>
 	</build>
 
 </project>
