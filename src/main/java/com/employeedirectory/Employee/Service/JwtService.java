@@ -3,8 +3,7 @@ package com.employeedirectory.Employee.Service;
 import com.employeedirectory.UserDetails.UserDetailsEntity.UserInfo;
 import com.employeedirectory.UserDetails.UserDetailsRepository.UserInfoRepository;
 import com.employeedirectory.UserDetails.UserDetailsService.UserInfoUserDetails;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.function.Function;
-import io.jsonwebtoken.Claims;
 
 @Component
 public class JwtService {
@@ -58,8 +56,21 @@ public class JwtService {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            final String username = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        } catch (SignatureException ex) {
+            System.out.println("Invalid JWT Signature");
+        } catch (MalformedJwtException ex) {
+            System.out.println("Invalid JWT Token");
+        } catch (ExpiredJwtException ex) {
+            System.out.println("Expired JWT Token");
+        } catch (UnsupportedJwtException ex) {
+            System.out.println("Unsupported JWT token");
+        } catch (IllegalArgumentException ex) {
+            System.out.println("JWT claims string is empty");
+        }
+        return false;
     }
 
 
