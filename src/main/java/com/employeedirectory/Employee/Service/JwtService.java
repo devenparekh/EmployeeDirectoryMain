@@ -17,8 +17,6 @@ import io.jsonwebtoken.Claims;
 
 @Component
 public class JwtService {
-
-    UserInfoUserDetails userDetails;
     private String secret;
     private int jwtExpirationInMs;
 
@@ -82,7 +80,6 @@ public class JwtService {
     }
 
     private String createToken(Map<String, Object> claims, String userName){
-        Map<String,String> header = new HashMap<>();
         return Jwts.builder()
                     .setClaims(claims)
                     .setSubject(userName)

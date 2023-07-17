@@ -18,8 +18,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import java.io.UnsupportedEncodingException;
-
 
 @RestController
 public class UserDetailsController {
@@ -50,7 +48,7 @@ public class UserDetailsController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) throws UnsupportedEncodingException {
+    public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest){
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         if (authentication.isAuthenticated()) {
