@@ -4,6 +4,7 @@ import com.employeedirectory.UserDetails.UserDetailsEntity.UserInfo;
 import com.employeedirectory.UserDetails.UserDetailsRepository.UserInfoRepository;
 import com.employeedirectory.UserDetails.UserDetailsService.UserInfoUserDetails;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.impl.TextCodec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -56,25 +57,12 @@ public class JwtService {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        try {
-            final String username = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+            final String username = extractUsername(token);
             return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-        } catch (SignatureException ex) {
-            System.out.println("Invalid JWT Signature");
-        } catch (MalformedJwtException ex) {
-            System.out.println("Invalid JWT Token");
-        } catch (ExpiredJwtException ex) {
-            System.out.println("Expired JWT Token");
-        } catch (UnsupportedJwtException ex) {
-            System.out.println("Unsupported JWT token");
-        } catch (IllegalArgumentException ex) {
-            System.out.println("JWT claims string is empty");
-        }
-        return false;
     }
 
 
-    public String generateToken(UserInfoUserDetails userDetails) {
+    public String generateToken(UserDetails userDetails) {
 
         Optional<UserInfo> userInfo = userInfoRepository.findByName(userDetails.getUsername());
         String userEmail = userInfo.get().getEmail();
@@ -82,10 +70,10 @@ public class JwtService {
         Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
             claims.put("Email",userEmail);
             if (roles.contains(new SimpleGrantedAuthority("ADMIN")) || roles.contains(new SimpleGrantedAuthority("admin"))){
-                claims.put("isAdmin",true);
+                claims.put("Role","ADMIN");
             }
             if (roles.contains(new SimpleGrantedAuthority("USER")) || roles.contains(new SimpleGrantedAuthority("user"))){
-                claims.put("isUser",true);
+                claims.put("Role","USER");
             }
         return createToken(claims,userDetails.getUsername());
     }
@@ -96,6 +84,6 @@ public class JwtService {
                     .setSubject(userName)
                     .setIssuedAt(new Date(System.currentTimeMillis()))
                     .setExpiration(new Date(System.currentTimeMillis()+jwtExpirationInMs))
-                    .signWith(SignatureAlgorithm.HS256,Base64.getEncoder().encodeToString(secret.getBytes())).compact();
+                    .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.decode(secret)).compact();
     }
 }

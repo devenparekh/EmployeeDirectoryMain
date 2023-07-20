@@ -33,7 +33,7 @@ public class UserController {
 
     @ApiOperation(value = "Get All Employees",
             notes = "This method gets all Employees")
-    @GetMapping(path = "/api/v1/getAllEmployees")
+    @GetMapping(path = "/api/v2/getAllEmployees")
     public List<Employee> getEmployees()
     {
         try {
@@ -50,7 +50,7 @@ public class UserController {
 
     @ApiOperation(value = "Fetch Employee By ID",
             notes = "This method gets a Employee by ID")
-    @GetMapping(path = "api/v1/Employee/{employeeId}")
+    @GetMapping(path = "api/v1/getOneEmployee/{employeeId}")
     public ResponseEntity<Employee> getEmployeeById(@ApiParam(name ="EmployeeId", value = "ID of Employee", example = "1", required = true)
             @PathVariable ("employeeId") Long employeeId){
           try{
@@ -69,7 +69,7 @@ public class UserController {
     })
     @ApiOperation(value = "Add New Employee",
             notes = "This method Adds New Employee Records")
-    @PostMapping(path = "api/v1/Employee/register")
+    @PostMapping(path = "api/v2/addNewEmployee/register")
     public ResponseEntity<Employee> register(@RequestBody Employee employee){
        try{
            employeeService.addNewEntry(employee);
@@ -83,7 +83,7 @@ public class UserController {
 
     @ApiOperation(value = "Update Employee Details By ID",
             notes = "This method Updates Employee Records by ID")
-    @PutMapping(path = "api/v1/Employee/{EmployeeId}")
+    @PutMapping(path = "api/v1/updateEmployee/{EmployeeId}")
     public ResponseEntity<Employee> updateEmployee(@PathVariable ("EmployeeId") Long employeeId,
                                                  @RequestParam(required = false) String name,
                                                  @RequestParam(required = false) String email,
@@ -101,7 +101,7 @@ public class UserController {
 
     @ApiOperation(value = "Delete Employee Details By ID",
             notes = "This method deletes Employee Records by ID")
-    @DeleteMapping(path = "api/v1/Employee/{EmployeeId}")
+    @DeleteMapping(path = "api/v2/deleteEmployee/{EmployeeId}")
     public void removeEntry(@PathVariable ("EmployeeId") Long EmployeeId) {
         try {
             employeeService.deleteEntry(EmployeeId);

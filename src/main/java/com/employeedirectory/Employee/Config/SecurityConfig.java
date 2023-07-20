@@ -1,5 +1,6 @@
 package com.employeedirectory.Employee.Config;
 
+import com.employeedirectory.Employee.Filter.JwtAuthFilter;
 import com.employeedirectory.UserDetails.UserDetailsService.UserInfoUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +25,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserInfoUserDetailsService userInfoUserDetailsService;
 
+    @Autowired
+    JwtAuthFilter jwtAuthFilter;
+
     @Bean
     public UserDetailsService userDetailsService(){
         return new UserInfoUserDetailsService();
@@ -30,16 +35,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests().antMatchers("/","/newUser","/authenticate").permitAll()
+//        http.csrf().disable()
+//                .authorizeRequests().antMatchers("/","/newUser","/authenticate").permitAll()
+//                .and()
+//                .authorizeRequests()
+//                .antMatchers("/api/v1/**").hasAnyAuthority("ADMIN","admin","USER","user").anyRequest().authenticated().
+//                and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.authorizeRequests()
+                .antMatchers("/","/authenticate","/newUser","/swagger-ui.html").permitAll()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/v1/**").authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .antMatchers("api/v1/**").access("hasAnyRole('ADMIN','USER')")
+                .antMatchers("api/v2/**").access("hasRole('ADMIN')")
+                .anyRequest().authenticated();
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userInfoUserDetailsService).passwordEncoder(passwordEncoder());
+        auth.authenticationProvider(authenticationProvider());
     }
     @Bean
     public PasswordEncoder passwordEncoder(){
