@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -84,19 +85,18 @@ public class UserController {
     @ApiOperation(value = "Update Employee Details By ID",
             notes = "This method Updates Employee Records by ID")
     @PutMapping(path = "api/v1/updateEmployee/{EmployeeId}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable ("EmployeeId") Long employeeId,
+    public ResponseEntity<String> updateEmployee(@PathVariable ("EmployeeId") Long employeeId,
                                                  @RequestParam(required = false) String name,
                                                  @RequestParam(required = false) String email,
-                                                 @RequestParam(required = false) String dob){
-       Employee updatedEmployee = null;
+                                                 @RequestParam(required = false) LocalDate dob){
         try{
-            updatedEmployee = employeeService.updateEntry(employeeId,name,email,dob);
-            return ResponseEntity.ok(updatedEmployee);
+            employeeService.updateEntry(employeeId,name,email,dob);
+            return ResponseEntity.ok("Updated!");
         }
         catch (Exception e){
             e.printStackTrace();
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(updatedEmployee);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error updating the records!");
     }
 
     @ApiOperation(value = "Delete Employee Details By ID",

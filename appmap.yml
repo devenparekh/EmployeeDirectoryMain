@@ -1,0 +1,4 @@
+name: "employeeDirectory"
+appmap_dir: "target/appmap"
+packages:
+- path: "com.employeedirectory"
