@@ -54,26 +54,23 @@ public class EmployeeService {
         return employeeList;
     }
 
-    public String deleteEntry(Long employeeId) {
+    public void deleteEntry(Long employeeId) {
     System.out.println("************* Inside deleteEntry Method **********");
     boolean exists = employeeRepository.existsById(employeeId);
         if (!exists){
         System.out.println("Employee cannot be found for the given ID");
         System.out.println("************* Exiting deleteEntry Method **********");
-            return "404 NOT FOUND";
         }
         else {
         System.out.println("Deleting Employee Details for the ID : " + employeeId);
         employeeRepository.deleteById(employeeId);
         System.out.println("************* Exiting deleteEntry Method **********");
-        return "200 DATA DELETED";
         }
 
     }
 
     @Transactional
-    public Employee updateEntry(Long employeeId, String name, String email, String dob) {
-        Employee updatedEmployee = new Employee();
+    public void updateEntry(Long employeeId, String name, String email, LocalDate dob) {
 
         System.out.println("************* Inside updateEntry Method **********");
         Employee employee = employeeRepository.findById(employeeId)
@@ -81,15 +78,13 @@ public class EmployeeService {
 
             if (name != null && name.length()>0 && !employee.getName().equals(name)) {
                 employee.setName(name);
-                updatedEmployee.setName(name);
                 System.out.println("Name updated from " + employee.getName() + " to " + name);
             }
 
-            LocalDate dateofBirth = LocalDate.parse(dob);
-            if (dateofBirth != null && !employee.getDob().equals(dateofBirth)){
-                employee.setDob(dateofBirth);
-                updatedEmployee.setDob(dateofBirth);
-                System.out.println("Age updated from " + employee.getDob() + " to " + dateofBirth);
+
+            if (dob != null && !employee.getDob().equals(dob)){
+                employee.setDob(dob);
+                System.out.println("Age updated from " + employee.getDob() + " to " + dob);
             }
 
             if (email != null && email.length()>0 && !employee.getEmail().equals(email)){
@@ -98,11 +93,9 @@ public class EmployeeService {
                         throw new IllegalStateException("Email already present.");
                     }
                 employee.setEmail(email);
-                updatedEmployee.setEmail(email);
                 System.out.println("Email updated from " + employee.getEmail() + " to " + email);
         }
         System.out.println("************* Exiting updateEntry Method **********");
-            return updatedEmployee;
     }
 
     public Employee getEmployeeById(Long employeeId) {

@@ -23,9 +23,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private UserInfoUserDetailsService userInfoUserDetailsService;
-
-    @Autowired
     JwtAuthFilter jwtAuthFilter;
 
     @Bean
@@ -35,26 +32,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-//        http.csrf().disable()
-//                .authorizeRequests().antMatchers("/","/newUser","/authenticate").permitAll()
-//                .and()
-//                .authorizeRequests()
-//                .antMatchers("/api/v1/**").hasAnyAuthority("ADMIN","admin","USER","user").anyRequest().authenticated().
-//                and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests()
-                .antMatchers("/","/authenticate","/newUser","/swagger-ui.html").permitAll()
+        http.csrf().disable()
+                .authorizeRequests().antMatchers("/","/newUser","/authenticate").permitAll()
                 .and()
                 .authorizeRequests()
-                .antMatchers("api/v1/**").access("hasAnyRole('ADMIN','USER')")
-                .antMatchers("api/v2/**").access("hasRole('ADMIN')")
-                .anyRequest().authenticated();
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .antMatchers("api/v1/**").hasAnyAuthority("ADMIN","USER")
+                .antMatchers("api/v2/**").hasAnyAuthority("ADMIN")
+                .anyRequest().authenticated().
+                and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+    public void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authenticationProvider());
     }
     @Bean
